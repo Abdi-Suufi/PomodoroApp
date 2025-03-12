@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.ComponentModel;
 
 namespace PomodoroApp
 {
@@ -271,6 +272,129 @@ namespace PomodoroApp
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+        public class Task : INotifyPropertyChanged
+        {
+            private string _description;
+            private bool _isCompleted;
+
+            public string Description
+            {
+                get { return _description; }
+                set
+                {
+                    if (_description != value)
+                    {
+                        _description = value;
+                        OnPropertyChanged(nameof(Description));
+                    }
+                }
+            }
+
+            public bool IsCompleted
+            {
+                get { return _isCompleted; }
+                set
+                {
+                    if (_isCompleted != value)
+                    {
+                        _isCompleted = value;
+                        OnPropertyChanged(nameof(IsCompleted));
+                        OnPropertyChanged(nameof(TextDecorationValue));
+                    }
+                }
+            }
+
+            // Use TextDecoration as a TextDecorationCollection property
+            public TextDecorationCollection TextDecorationValue
+            {
+                get
+                {
+                    if (IsCompleted)
+                    {
+                        return TextDecorations.Strikethrough;
+                    }
+                    return null;
+                }
+            }
+
+            public Task(string description)
+            {
+                _description = description;
+                _isCompleted = false;
+            }
+
+            // Implement INotifyPropertyChanged
+            public event PropertyChangedEventHandler PropertyChanged;
+
+            protected virtual void OnPropertyChanged(string propertyName)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        private void AddTaskButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddNewTask();
+        }
+
+        private void NewTaskTextBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                AddNewTask();
+            }
+        }
+
+        private void AddNewTask()
+        {
+            string taskDescription = NewTaskTextBox.Text.Trim();
+            if (!string.IsNullOrEmpty(taskDescription))
+            {
+                TasksListBox.Items.Add(new Task(taskDescription));
+                NewTaskTextBox.Text = string.Empty;
+            }
+        }
+
+        private void DeleteTaskButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            if (button != null)
+            {
+                ListBoxItem item = FindAncestor<ListBoxItem>(button);
+                if (item != null)
+                {
+                    TasksListBox.Items.Remove(item.DataContext);
+                }
+            }
+        }
+
+        private void TaskCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            CheckBox checkBox = sender as CheckBox;
+            if (checkBox != null)
+            {
+                Task task = checkBox.DataContext as Task;
+                if (task != null)
+                {
+                    // Trigger UI update for text decoration
+                    TasksListBox.Items.Refresh();
+                }
+            }
+        }
+
+        // Helper method to find ancestor
+        private static T FindAncestor<T>(DependencyObject current) where T : DependencyObject
+        {
+            do
+            {
+                if (current is T)
+                {
+                    return (T)current;
+                }
+                current = VisualTreeHelper.GetParent(current);
+            }
+            while (current != null);
+            return null;
         }
     }
 }

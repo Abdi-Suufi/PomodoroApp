@@ -34,6 +34,44 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="TaskItemStyle" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="Background" Value="#2E3440"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="6">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter Grid.Column="0"/>
+                                <Button x:Name="DeleteButton" Grid.Column="1" Content="×" 
+                                Foreground="#D8DEE9" Background="Transparent" BorderThickness="0"
+                                Visibility="Collapsed" Click="DeleteTaskButton_Click"
+                                Width="30" Height="30" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#3B4252"/>
+                                <Setter TargetName="DeleteButton" Property="Visibility" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#434C5E"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Border CornerRadius="20" Background="#21252B" BorderThickness="1" BorderBrush="#3B4252">
@@ -133,44 +171,123 @@
             </StackPanel>
 
             <!-- Settings Panel -->
-            <Expander Grid.Row="3" Margin="20,0,20,20" IsExpanded="False" Background="#2E3440" BorderThickness="0">
-                <Expander.Header>
-                    <TextBlock Text="SETTINGS" Foreground="#81A1C1" FontSize="14" FontWeight="SemiBold"/>
-                </Expander.Header>
-                <Grid Margin="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="40"/>
-                    </Grid.ColumnDefinitions>
+            <TabControl Grid.Row="3" Margin="20,0,20,20" Background="Transparent" BorderThickness="0">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Background" Value="#2E3440"/>
+                        <Setter Property="Foreground" Value="#81A1C1"/>
+                        <Setter Property="Padding" Value="15,8"/>
+                        <Setter Property="Margin" Value="0,0,5,0"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6,6,0,0" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter ContentSource="Header"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#3B4252"/>
+                                            <Setter Property="Foreground" Value="#ECEFF4"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#3B4252"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TabControl.Resources>
 
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Work Time" Foreground="#D8DEE9" VerticalAlignment="Center" Margin="0,0,10,10"/>
-                    <Slider x:Name="WorkDurationSlider" Grid.Row="0" Grid.Column="1" Minimum="1" Maximum="60" Value="25" 
-                            TickFrequency="5" IsSnapToTickEnabled="True" ValueChanged="WorkDurationSlider_ValueChanged"
-                            Background="#3B4252" Foreground="#BF616A"/>
-                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding ElementName=WorkDurationSlider, Path=Value, StringFormat='{}{0:0} min'}" 
-                               Foreground="#D8DEE9" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                <!-- Settings Tab -->
+                <TabItem Header="SETTINGS">
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="40"/>
+                        </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Short Break" Foreground="#D8DEE9" VerticalAlignment="Center" Margin="0,0,10,10"/>
-                    <Slider x:Name="BreakDurationSlider" Grid.Row="1" Grid.Column="1" Minimum="1" Maximum="30" Value="5" 
-                            TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="BreakDurationSlider_ValueChanged"
-                            Background="#3B4252" Foreground="#A3BE8C"/>
-                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding ElementName=BreakDurationSlider, Path=Value, StringFormat='{}{0:0} min'}"
-                               Foreground="#D8DEE9" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Work Time" Foreground="#D8DEE9" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                        <Slider x:Name="WorkDurationSlider" Grid.Row="0" Grid.Column="1" Minimum="1" Maximum="60" Value="25" 
+                    TickFrequency="5" IsSnapToTickEnabled="True" ValueChanged="WorkDurationSlider_ValueChanged"
+                    Background="#3B4252" Foreground="#BF616A"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding ElementName=WorkDurationSlider, Path=Value, StringFormat='{}{0:0} min'}" 
+                       Foreground="#D8DEE9" VerticalAlignment="Center" HorizontalAlignment="Right"/>
 
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Long Break" Foreground="#D8DEE9" VerticalAlignment="Center" Margin="0,0,10,10"/>
-                    <Slider x:Name="LongBreakDurationSlider" Grid.Row="2" Grid.Column="1" Minimum="5" Maximum="60" Value="15" 
-                            TickFrequency="5" IsSnapToTickEnabled="True" ValueChanged="LongBreakDurationSlider_ValueChanged"
-                            Background="#3B4252" Foreground="#5E81AC"/>
-                    <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding ElementName=LongBreakDurationSlider, Path=Value, StringFormat='{}{0:0} min'}"
-                               Foreground="#D8DEE9" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-                </Grid>
-            </Expander>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Short Break" Foreground="#D8DEE9" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                        <Slider x:Name="BreakDurationSlider" Grid.Row="1" Grid.Column="1" Minimum="1" Maximum="30" Value="5" 
+                    TickFrequency="1" IsSnapToTickEnabled="True" ValueChanged="BreakDurationSlider_ValueChanged"
+                    Background="#3B4252" Foreground="#A3BE8C"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding ElementName=BreakDurationSlider, Path=Value, StringFormat='{}{0:0} min'}"
+                       Foreground="#D8DEE9" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Long Break" Foreground="#D8DEE9" VerticalAlignment="Center" Margin="0,0,10,10"/>
+                        <Slider x:Name="LongBreakDurationSlider" Grid.Row="2" Grid.Column="1" Minimum="5" Maximum="60" Value="15" 
+                    TickFrequency="5" IsSnapToTickEnabled="True" ValueChanged="LongBreakDurationSlider_ValueChanged"
+                    Background="#3B4252" Foreground="#5E81AC"/>
+                        <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding ElementName=LongBreakDurationSlider, Path=Value, StringFormat='{}{0:0} min'}"
+                       Foreground="#D8DEE9" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                    </Grid>
+                </TabItem>
+
+                <!-- Tasks Tab -->
+                <TabItem Header="TASKS">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" BorderThickness="0" Background="#2E3440" CornerRadius="10" Padding="5" Margin="0,10,0,0">
+                            <ListBox x:Name="TasksListBox" Background="Transparent" BorderThickness="0" 
+                         ItemContainerStyle="{StaticResource TaskItemStyle}" MinHeight="150">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox Grid.Column="0" IsChecked="{Binding IsCompleted}" Margin="0,0,10,0" 
+                                          Checked="TaskCheckBox_Checked"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Description}" Foreground="#ECEFF4" 
+                                           TextDecorations="{Binding TextDecorationValue}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+
+                        <Grid Grid.Row="1" Margin="0,10,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="NewTaskTextBox" Grid.Column="0" Padding="10,8" 
+                         Background="#3B4252" Foreground="#ECEFF4" BorderThickness="0" 
+                         VerticalContentAlignment="Center" BorderBrush="#4C566A"
+                         KeyDown="NewTaskTextBox_KeyDown"/>
+
+                            <Button x:Name="AddTaskButton" Grid.Column="1" Content="Add" Margin="10,0,0,0" Padding="15,8"
+                        Background="#5E81AC" Foreground="White" BorderThickness="0" 
+                        Click="AddTaskButton_Click"/>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
         </Grid>
     </Border>
 </Window>
